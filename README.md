@@ -105,22 +105,14 @@ portfolio/
 
 ## 🌐 Deployment
 
-### GitHub Pages (Free)
-1. Push your code to a GitHub repository
-2. Go to Repository Settings → Pages
-3. Select "Deploy from branch" and choose your main branch
-4. Your site will be available at `https://username.github.io/repository-name`
+# 🚀 Portfolio Website Setup Guide
 
-### Netlify (Recommended)
-1. Drag and drop your project folder to Netlify
-2. Or connect your GitHub repository for automatic deployments
-3. Custom domain can be added in settings
+## Quick Setup Steps:
 
-### Other Options
-- Vercel
-- Firebase Hosting
-- AWS S3 + CloudFront
-- Traditional web hosting
+### 1. 🎯 Replace Google Script URL
+In `script.js`, find this line:
+```javascript
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
 
 ## 📧 Contact Form Setup
 
