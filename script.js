@@ -219,6 +219,78 @@ if ('IntersectionObserver' in window) {
     imageObserver.observe(img);
   });
 }
+// Notion Form Submission
+document.getElementById('notionContactForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const submitBtn = document.getElementById('submitBtn');
+    const formMessage = document.getElementById('formMessage');
+    const originalText = submitBtn.textContent;
+    
+    // Show loading state
+    submitBtn.textContent = 'Sending...';
+    submitBtn.disabled = true;
+    formMessage.style.display = 'none';
+    
+    const formData = {
+        name: document.getElementById('name').value,
+        email: document.getElementById('email').value,
+        service: document.getElementById('service').value,
+        message: document.getElementById('message').value
+    };
+    
+    try {
+        const response = await fetch('/.netlify/functions/submit-to-notion', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.error || 'Failed to submit form');
+        }
+        
+        // Success message
+        formMessage.textContent = '✅ Thank you! Your message has been sent successfully. I\'ll get back to you within 24 hours.';
+        formMessage.style.backgroundColor = '#d4edda';
+        formMessage.style.color = '#155724';
+        formMessage.style.border = '1px solid #c3e6cb';
+        formMessage.style.display = 'block';
+        
+        // Reset form
+        document.getElementById('notionContactForm').reset();
+        
+    } catch (error) {
+        console.error('Error:', error);
+        formMessage.textContent = `❌ ${error.message}. Please try again or email me directly at kbhanabhagwanwalapn@gmail.com`;
+        formMessage.style.backgroundColor = '#f8d7da';
+        formMessage.style.color = '#721c24';
+        formMessage.style.border = '1px solid #f5c6cb';
+        formMessage.style.display = 'block';
+    } finally {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+    }
+});
+
+// Dynamic placeholder based on service selection
+document.getElementById('service').addEventListener('change', function() {
+    const messageField = document.getElementById('message');
+    const selectedService = this.value;
+    
+    const placeholders = {
+        'Accounting Services': 'Tell me about your accounting needs, bookkeeping requirements, or financial reporting...',
+        'Notion Systems': 'Describe your Notion project, what workflows you want to automate, or templates needed...',
+        'Both Services': 'Tell me about both your accounting needs and Notion project requirements...',
+        'Other': 'How can I help you with your business needs?'
+    };
+    
+    messageField.placeholder = placeholders[selectedService] || 'How can I help you?';
+});
 
 // Service type indicator in contact form
 const serviceSelect = document.querySelector('select[name="service"]');
