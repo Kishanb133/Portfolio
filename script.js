@@ -1,4 +1,4 @@
-// ===== PORTFOLIO SCRIPT =====
+// ===== SIMPLE PORTFOLIO SCRIPT =====
 console.log("🚀 Portfolio Loaded Successfully");
 
 // Page Loader
@@ -77,84 +77,97 @@ function animateSkillBars() {
     });
 }
 
-// ===== GOOGLE APPS SCRIPT FORM HANDLING =====
+// ===== SIMPLE CONTACT FORM HANDLING =====
 
-// 🔥 IMPORTANT: Replace this URL with your Google Apps Script URL
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/1Dx4qumi46qnmjvEgLJItIbeMXAzRpf9YrYAwAx2VegTq0IaKq1zhN4S-/exec';
-
-// Form Submission
-document.getElementById('contactForm').addEventListener('submit', async function(e) {
+document.getElementById('contactForm').addEventListener('submit', function(e) {
     e.preventDefault();
     
     const submitBtn = document.getElementById('submitBtn');
-    const formMessage = document.getElementById('formMessage');
     const originalText = submitBtn.textContent;
     
     // Show loading state
-    submitBtn.textContent = 'Sending...';
+    submitBtn.textContent = 'Opening Email...';
+    submitBtn.classList.add('btn-loading');
     submitBtn.disabled = true;
-    formMessage.className = '';
-    formMessage.style.display = 'none';
     
     // Get form data
     const formData = {
-        name: document.getElementById('name').value.trim(),
-        email: document.getElementById('email').value.trim(),
-        service: document.getElementById('service').value,
-        message: document.getElementById('message').value.trim()
+        name: document.querySelector('input[name="name"]').value.trim(),
+        email: document.querySelector('input[name="email"]').value.trim(),
+        service: document.querySelector('select[name="service"]').value,
+        message: document.querySelector('textarea[name="message"]').value.trim()
     };
     
     // Validate form
     if (!formData.name || !formData.email || !formData.service || !formData.message) {
-        showFormMessage('Please fill in all fields', 'error');
+        alert('Please fill in all fields before sending.');
         resetButton();
         return;
     }
     
-    try {
-        console.log('Sending form data to Google Apps Script...');
-        
-        const response = await fetch(GOOGLE_SCRIPT_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            mode: 'no-cors', // Important for Google Apps Script
-            body: JSON.stringify(formData)
-        });
+    // Create email content
+    const subject = `Portfolio Contact: ${formData.name} - ${formData.service}`;
+    const body = `
+Name: ${formData.name}
+Email: ${formData.email}
+Service: ${formData.service}
 
-        // Since we use no-cors, we can't read the response
-        // But we assume it worked if no error thrown
-        showFormMessage('✅ Thank you! Your message has been sent successfully. I\'ll get back to you within 24 hours.', 'success');
+Message:
+${formData.message}
+
+---
+Sent from your portfolio website
+    `.trim();
+    
+    // Create mailto link
+    const mailtoLink = `mailto:kbhanabhagwanwalapn@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    
+    // Open email client
+    setTimeout(() => {
+        window.location.href = mailtoLink;
         
-        // Reset form
-        document.getElementById('contactForm').reset();
+        // Show success message after a delay
+        setTimeout(() => {
+            showSuccessMessage();
+            resetButton();
+        }, 2000);
         
-    } catch (error) {
-        console.error('Form submission error:', error);
-        showFormMessage('❌ Message sent! (Confirmation may take a moment). For urgent matters, email me directly at kbhanabhagwanwalapn@gmail.com', 'success');
-    } finally {
-        resetButton();
-    }
+    }, 1000);
     
     function resetButton() {
         submitBtn.textContent = originalText;
+        submitBtn.classList.remove('btn-loading');
         submitBtn.disabled = false;
     }
     
-    function showFormMessage(message, type) {
-        formMessage.innerHTML = message;
-        formMessage.className = type;
-        formMessage.style.display = 'block';
+    function showSuccessMessage() {
+        // Create success message
+        const successDiv = document.createElement('div');
+        successDiv.className = 'alternative-contact form-success';
+        successDiv.innerHTML = `
+            <h3>✅ Email Ready to Send!</h3>
+            <p>Your email client should open with your message pre-filled.</p>
+            <p><strong>Just click "Send" to complete!</strong></p>
+            <p><small>If email doesn't open, please send manually to: kbhanabhagwanwalapn@gmail.com</small></p>
+        `;
         
-        // Scroll to message
-        formMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        // Insert after form
+        const form = document.getElementById('contactForm');
+        form.parentNode.insertBefore(successDiv, form.nextSibling);
+        
+        // Clear form
+        form.reset();
+        
+        // Remove success message after 10 seconds
+        setTimeout(() => {
+            successDiv.remove();
+        }, 10000);
     }
 });
 
-// Dynamic Placeholder
-document.getElementById('service').addEventListener('change', function() {
-    const messageField = document.getElementById('message');
+// Dynamic Placeholder for Service Selection
+document.querySelector('select[name="service"]').addEventListener('change', function() {
+    const messageField = document.querySelector('textarea[name="message"]');
     const selectedService = this.value;
     
     const placeholders = {
@@ -178,4 +191,16 @@ if (profilePic) {
     });
 }
 
-console.log("🎯 Portfolio enhanced with Google Apps Script integration!");
+// Smooth scrolling for navigation links
+document.querySelectorAll('nav a').forEach(link => {
+    link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('href');
+        const targetSection = document.querySelector(targetId);
+        if (targetSection) {
+            targetSection.scrollIntoView({ behavior: 'smooth' });
+        }
+    });
+});
+
+console.log("🎯 Portfolio ready! Simple contact form implemented.");
