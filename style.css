@@ -31,6 +31,14 @@ body {
     line-height: 1.6;
     overflow-x: hidden;
 }
+.summary-paragraph {
+    margin-bottom: 1.5em;
+    line-height: 1.7;
+}
+
+.summary-paragraph:last-child {
+    margin-bottom: 0;
+}
 /* ===== FORMSUBMIT FORM STYLES ===== */
 .form-submit-loading {
     position: relative;
