@@ -31,6 +31,43 @@ body {
     line-height: 1.6;
     overflow-x: hidden;
 }
+/* ===== TYPOGRAPHY & SPACING FIXES ===== */
+.section p {
+    margin: 0 0 1.2em 0;
+    line-height: 1.7;
+    text-align: left;
+}
+
+.section p:last-child {
+    margin-bottom: 0;
+}
+
+/* Summary section specific spacing */
+#summary p {
+    margin-bottom: 1.5em;
+    line-height: 1.8;
+}
+
+#summary p:last-of-type {
+    margin-bottom: 0;
+}
+
+/* Ensure sections have proper padding */
+.section {
+    padding: 40px;
+}
+
+/* Mobile spacing adjustments */
+@media (max-width: 768px) {
+    .section p {
+        margin-bottom: 1em;
+        line-height: 1.6;
+    }
+    
+    #summary p {
+        margin-bottom: 1.2em;
+    }
+}
 .summary-paragraph {
     margin-bottom: 1.5em;
     line-height: 1.7;
