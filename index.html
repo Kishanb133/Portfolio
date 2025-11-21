@@ -161,24 +161,17 @@
     <h2>📨 Contact Me</h2>
     <p>Interested in accounting services or want to discuss <strong>leveraging Notion to create accounting-efficient business systems</strong> for your organization? Get in touch to explore how we can streamline your financial and operational processes.</p>
     
-    <!-- FormSubmit Contact Form -->
-    <form action="https://formsubmit.co/kbhanabhagwanwalapn@gmail.com" method="POST">
-        <!-- FormSubmit Configuration -->
-        <input type="hidden" name="_subject" value="New Portfolio Inquiry - Kishan Bhanabhagwanwala">
-        <input type="hidden" name="_captcha" value="false">
-        <input type="hidden" name="_template" value="table">
-        <input type="hidden" name="_autoresponse" value="Hi there! Thanks for reaching out. I have received your message and will get back to you within 24 hours. Best regards, Kishan.">
-        <input type="text" name="_honey" style="display:none">
-        
+    <!-- Google Apps Script Contact Form -->
+    <form id="googleContactForm">
         <!-- Form Fields -->
         <div class="form-group">
-            <input type="text" name="name" placeholder="Your Full Name" required>
+            <input type="text" id="name" name="name" placeholder="Your Full Name" required>
         </div>
         <div class="form-group">
-            <input type="email" name="email" placeholder="your.email@example.com" required>
+            <input type="email" id="email" name="email" placeholder="your.email@example.com" required>
         </div>
         <div class="form-group">
-            <select name="service" required>
+            <select id="service" name="service" required>
                 <option value="">What service do you need?</option>
                 <option value="Accounting Services">Accounting & Bookkeeping</option>
                 <option value="Notion Systems">Notion System Building</option>
@@ -187,9 +180,9 @@
             </select>
         </div>
         <div class="form-group">
-            <textarea name="message" placeholder="Tell me about your project or business needs..." rows="5" required></textarea>
+            <textarea id="message" name="message" placeholder="Tell me about your project or business needs..." rows="5" required></textarea>
         </div>
-        <button type="submit">Send Message</button>
+        <button type="submit" id="submitBtn">Send Message</button>
     </form>
 
     <!-- Success Message (Initially Hidden) -->
@@ -197,6 +190,12 @@
         <h3>✅ Message Sent Successfully!</h3>
         <p>Thank you for your message. I'll get back to you within 24 hours.</p>
         <p><small>You should receive a confirmation email shortly.</small></p>
+    </div>
+
+    <!-- Error Message (Initially Hidden) -->
+    <div id="errorMessage" style="display: none; margin-top: 20px; padding: 20px; background: #f8d7da; color: #721c24; border-radius: 8px; text-align: center;">
+        <h3>❌ Error Sending Message</h3>
+        <p id="errorText">There was an error sending your message. Please try again or email me directly.</p>
     </div>
 </section>    
 
