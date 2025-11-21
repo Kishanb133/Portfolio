@@ -72,6 +72,40 @@ body {
     text-align: center;
 }
 
+/* Back to Top Button Styles */
+.back-to-top {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    background: var(--primary);
+    color: var(--white);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2rem;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.back-to-top.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.back-to-top:hover {
+    background: var(--primary-dark);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+}
+
 /* Loading animation */
 @keyframes spin {
     0% { transform: rotate(0deg); }
