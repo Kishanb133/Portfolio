@@ -1,4 +1,4 @@
-// ===== SIMPLE PORTFOLIO SCRIPT =====
+// ===== PORTFOLIO LOADER & ANIMATIONS =====
 console.log("🚀 Portfolio Loaded Successfully");
 
 // Page Loader
@@ -14,7 +14,7 @@ window.addEventListener('load', function() {
     }
 });
 
-// Scroll Animations
+// Intersection Observer for scroll animations
 const observerOptions = {
     threshold: 0.1,
     rootMargin: '0px 0px -50px 0px'
@@ -38,7 +38,7 @@ document.querySelectorAll('.section').forEach(section => {
     observer.observe(section);
 });
 
-// Active Navigation
+// Active Navigation Highlighting
 const sections = document.querySelectorAll('.section');
 const navLinks = document.querySelectorAll('nav a');
 
@@ -77,110 +77,76 @@ function animateSkillBars() {
     });
 }
 
-// ===== SIMPLE CONTACT FORM HANDLING =====
+// Back to Top Button (if you had this)
+const backToTopButton = document.createElement('button');
+backToTopButton.innerHTML = '↑';
+backToTopButton.className = 'back-to-top';
+backToTopButton.setAttribute('aria-label', 'Back to top');
+document.body.appendChild(backToTopButton);
 
-document.getElementById('contactForm').addEventListener('submit', function(e) {
-    e.preventDefault();
+backToTopButton.addEventListener('click', () => {
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
+});
+
+window.addEventListener('scroll', () => {
+    if (window.pageYOffset > 300) {
+        backToTopButton.classList.add('visible');
+    } else {
+        backToTopButton.classList.remove('visible');
+    }
+});
+
+// Typing Effect for Hero Name (if you had this)
+function typeWriter(element, text, speed = 100) {
+    let i = 0;
+    element.textContent = '';
     
-    const submitBtn = document.getElementById('submitBtn');
-    const originalText = submitBtn.textContent;
-    
-    // Show loading state
-    submitBtn.textContent = 'Opening Email...';
-    submitBtn.classList.add('btn-loading');
-    submitBtn.disabled = true;
-    
-    // Get form data
-    const formData = {
-        name: document.querySelector('input[name="name"]').value.trim(),
-        email: document.querySelector('input[name="email"]').value.trim(),
-        service: document.querySelector('select[name="service"]').value,
-        message: document.querySelector('textarea[name="message"]').value.trim()
-    };
-    
-    // Validate form
-    if (!formData.name || !formData.email || !formData.service || !formData.message) {
-        alert('Please fill in all fields before sending.');
-        resetButton();
-        return;
+    function type() {
+        if (i < text.length) {
+            element.textContent += text.charAt(i);
+            i++;
+            setTimeout(type, speed);
+        }
     }
     
-    // Create email content
-    const subject = `Portfolio Contact: ${formData.name} - ${formData.service}`;
-    const body = `
-Name: ${formData.name}
-Email: ${formData.email}
-Service: ${formData.service}
+    type();
+}
 
-Message:
-${formData.message}
-
----
-Sent from your portfolio website
-    `.trim();
-    
-    // Create mailto link
-    const mailtoLink = `mailto:kbhanabhagwanwalapn@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    
-    // Open email client
+// Initialize typing effect on hero name
+const heroName = document.querySelector('.hero-name');
+if (heroName) {
+    const originalName = heroName.textContent;
     setTimeout(() => {
-        window.location.href = mailtoLink;
-        
-        // Show success message after a delay
-        setTimeout(() => {
-            showSuccessMessage();
-            resetButton();
-        }, 2000);
-        
+        typeWriter(heroName, originalName, 120);
     }, 1000);
-    
-    function resetButton() {
-        submitBtn.textContent = originalText;
-        submitBtn.classList.remove('btn-loading');
-        submitBtn.disabled = false;
-    }
-    
-    function showSuccessMessage() {
-        // Create success message
-        const successDiv = document.createElement('div');
-        successDiv.className = 'alternative-contact form-success';
-        successDiv.innerHTML = `
-            <h3>✅ Email Ready to Send!</h3>
-            <p>Your email client should open with your message pre-filled.</p>
-            <p><strong>Just click "Send" to complete!</strong></p>
-            <p><small>If email doesn't open, please send manually to: kbhanabhagwanwalapn@gmail.com</small></p>
-        `;
-        
-        // Insert after form
-        const form = document.getElementById('contactForm');
-        form.parentNode.insertBefore(successDiv, form.nextSibling);
-        
-        // Clear form
-        form.reset();
-        
-        // Remove success message after 10 seconds
-        setTimeout(() => {
-            successDiv.remove();
-        }, 10000);
+}
+
+// Parallax Effect for Header (if you had this)
+window.addEventListener('scroll', () => {
+    const scrolled = window.pageYOffset;
+    const header = document.querySelector('header');
+    if (header) {
+        header.style.transform = `translateY(${scrolled * 0.5}px)`;
     }
 });
 
-// Dynamic Placeholder for Service Selection
-document.querySelector('select[name="service"]').addEventListener('change', function() {
-    const messageField = document.querySelector('textarea[name="message"]');
-    const selectedService = this.value;
+// Enhanced Hover Effects for Service Items
+const serviceItems = document.querySelectorAll('.service-list li, .why-list li');
+serviceItems.forEach(item => {
+    item.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateX(10px)';
+        this.style.transition = 'transform 0.3s ease';
+    });
     
-    const placeholders = {
-        'Accounting Services': 'Tell me about your accounting needs, bookkeeping requirements, or financial reporting...',
-        'Notion Systems': 'Describe your Notion project, what workflows you want to automate, or templates needed...',
-        'Both Services': 'Tell me about both your accounting needs and Notion project requirements...',
-        'Other': 'How can I help you with your business needs?'
-    };
-    
-    messageField.placeholder = placeholders[selectedService] || 'How can I help you?';
+    item.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateX(0)';
+    });
 });
 
-// Profile Picture Animation
+// Click Animation for Profile Picture
 const profilePic = document.querySelector('.profile-pic');
 if (profilePic) {
     profilePic.addEventListener('click', function() {
@@ -190,6 +156,156 @@ if (profilePic) {
         }, 300);
     });
 }
+
+// Keyboard Navigation Support
+document.addEventListener('keydown', function(e) {
+    // Escape key closes modals or resets states
+    if (e.key === 'Escape') {
+        backToTopButton.focus();
+    }
+    
+    // Home key scrolls to top
+    if (e.key === 'Home') {
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    
+    // End key scrolls to bottom
+    if (e.key === 'End') {
+        e.preventDefault();
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+});
+
+// Performance Optimization: Lazy Load Images
+if ('IntersectionObserver' in window) {
+    const imageObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const img = entry.target;
+                img.src = img.dataset.src;
+                img.classList.remove('lazy');
+                imageObserver.unobserve(img);
+            }
+        });
+    });
+
+    document.querySelectorAll('img[data-src]').forEach(img => {
+        imageObserver.observe(img);
+    });
+}
+
+// ===== FORMSUBMIT INTEGRATION (NEW) =====
+
+document.addEventListener('DOMContentLoaded', function() {
+    const contactForm = document.querySelector('#contact form');
+    const successMessage = document.getElementById('successMessage');
+    
+    if (contactForm) {
+        contactForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const submitBtn = contactForm.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            
+            // Show loading state
+            submitBtn.textContent = 'Sending...';
+            submitBtn.classList.add('form-submit-loading');
+            submitBtn.disabled = true;
+            
+            // Get form data for validation
+            const formData = new FormData(contactForm);
+            const name = formData.get('name');
+            const email = formData.get('email');
+            const service = formData.get('service');
+            const message = formData.get('message');
+            
+            // Validate form
+            if (!name || !email || !service || !message) {
+                showMessage('Please fill in all fields before sending.', 'error');
+                resetButton();
+                return;
+            }
+            
+            // Create a temporary iframe to handle form submission
+            const tempIframe = document.createElement('iframe');
+            tempIframe.name = 'formsubmit-target';
+            tempIframe.style.display = 'none';
+            document.body.appendChild(tempIframe);
+            
+            // Set form target to iframe
+            contactForm.target = 'formsubmit-target';
+            
+            // Handle iframe load event
+            tempIframe.onload = function() {
+                setTimeout(() => {
+                    // Show success message
+                    showMessage('success');
+                    
+                    // Reset form
+                    contactForm.reset();
+                    
+                    // Reset button
+                    resetButton();
+                    
+                    // Remove iframe
+                    document.body.removeChild(tempIframe);
+                    
+                    // Reset form target
+                    contactForm.target = '_self';
+                }, 1000);
+            };
+            
+            // Submit the form
+            contactForm.submit();
+            
+            function resetButton() {
+                submitBtn.textContent = originalText;
+                submitBtn.classList.remove('form-submit-loading');
+                submitBtn.disabled = false;
+            }
+            
+            function showMessage(type, customMessage = '') {
+                if (type === 'success') {
+                    successMessage.style.display = 'block';
+                    successMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                } else {
+                    // Create error message
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'form-error-message';
+                    errorDiv.innerHTML = `❌ ${customMessage}`;
+                    
+                    // Insert after form
+                    contactForm.parentNode.insertBefore(errorDiv, contactForm.nextSibling);
+                    
+                    // Remove error message after 5 seconds
+                    setTimeout(() => {
+                        errorDiv.remove();
+                    }, 5000);
+                }
+            }
+        });
+        
+        // Dynamic placeholder for service selection
+        const serviceSelect = contactForm.querySelector('select[name="service"]');
+        const messageField = contactForm.querySelector('textarea[name="message"]');
+        
+        if (serviceSelect && messageField) {
+            serviceSelect.addEventListener('change', function() {
+                const selectedService = this.value;
+                
+                const placeholders = {
+                    'Accounting Services': 'Tell me about your accounting needs: bookkeeping, tax preparation, financial reporting, etc...',
+                    'Notion Systems': 'Describe what you want to build: business dashboard, workflow automation, templates, etc...',
+                    'Both Services': 'Tell me about both your accounting needs and Notion system requirements...',
+                    'Consultation': 'What would you like to discuss in our consultation?'
+                };
+                
+                messageField.placeholder = placeholders[selectedService] || 'Please describe your project or requirements...';
+            });
+        }
+    }
+});
 
 // Smooth scrolling for navigation links
 document.querySelectorAll('nav a').forEach(link => {
@@ -203,4 +319,4 @@ document.querySelectorAll('nav a').forEach(link => {
     });
 });
 
-console.log("🎯 Portfolio ready! Simple contact form implemented.");
+console.log("🎯 Portfolio with ALL animations + FormSubmit integration ready!");
