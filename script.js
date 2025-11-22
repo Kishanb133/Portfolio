@@ -196,13 +196,22 @@ if ('IntersectionObserver' in window) {
 }
 
 // ===== FORMSUBMIT INTEGRATION =====
-
 document.addEventListener('DOMContentLoaded', function() {
     const contactForm = document.getElementById('contactForm');
     const successMessage = document.getElementById('successMessage');
-    const errorMessage = document.getElementById('errorMessage');
-    const errorText = document.getElementById('errorText');
     
+    // Create error message element if it doesn't exist
+    let errorMessage = document.getElementById('errorMessage');
+    if (!errorMessage) {
+        errorMessage = document.createElement('div');
+        errorMessage.id = 'errorMessage';
+        errorMessage.className = 'form-error-message';
+        errorMessage.style.display = 'none';
+        errorMessage.innerHTML = '<h3>❌ Error Sending Message</h3><p id="errorText"></p>';
+        contactForm.parentNode.insertBefore(errorMessage, contactForm.nextSibling);
+    }
+    const errorText = document.getElementById('errorText');
+
     if (contactForm) {
         contactForm.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -216,51 +225,45 @@ document.addEventListener('DOMContentLoaded', function() {
             successMessage.style.display = 'none';
             errorMessage.style.display = 'none';
             
-            // Get form data for validation
+            // Get form data
+            const formData = new FormData(contactForm);
+            
+            // Simple validation
             const name = contactForm.querySelector('input[name="name"]').value.trim();
             const email = contactForm.querySelector('input[name="email"]').value.trim();
             const service = contactForm.querySelector('select[name="service"]').value;
             const message = contactForm.querySelector('textarea[name="message"]').value.trim();
             
-            // Validate form
             if (!name || !email || !service || !message) {
                 showError('Please fill in all fields before sending.');
                 resetButton();
                 return;
             }
-            
-            // Create a temporary iframe to handle form submission
-            const tempIframe = document.createElement('iframe');
-            tempIframe.name = 'formsubmit-target';
-            tempIframe.style.display = 'none';
-            document.body.appendChild(tempIframe);
-            
-            // Set form target to iframe
-            contactForm.target = 'formsubmit-target';
-            
-            // Handle iframe load event
-            tempIframe.onload = function() {
-                setTimeout(() => {
-                    // Show success message
+
+            // Submit form directly to FormSubmit
+            fetch(contactForm.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
                     showSuccess();
-                    
-                    // Reset form
                     contactForm.reset();
-                    
-                    // Reset button
-                    resetButton();
-                    
-                    // Remove iframe
-                    document.body.removeChild(tempIframe);
-                    
-                    // Reset form target
-                    contactForm.target = '_self';
-                }, 1000);
-            };
-            
-            // Submit the form
-            contactForm.submit();
-            
+                } else {
+                    throw new Error('Form submission failed');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showError('Failed to send message. Please try again or contact me directly at kbhanabhagwanwalapn@gmail.com');
+            })
+            .finally(() => {
+                resetButton();
+            });
+
             function resetButton() {
                 submitBtn.textContent = originalText;
                 submitBtn.disabled = false;
