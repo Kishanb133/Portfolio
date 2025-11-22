@@ -195,101 +195,108 @@ if ('IntersectionObserver' in window) {
     });
 }
 
-// ===== GOOGLE APPS SCRIPT INTEGRATION =====
+// ===== FORMSUBMIT INTEGRATION =====
 
-// 🔥 REPLACE THIS WITH YOUR ACTUAL GOOGLE APPS SCRIPT URL
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/d/1XzPz5qaRfCL9jAov2Wt1f17BwDALBU31kfyEHODfwi00XSlOWHz6vwit/edit?usp=sharing';
-
-// Form submission handler for Google Apps Script
-document.getElementById('googleContactForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    
-    const submitBtn = document.getElementById('submitBtn');
+document.addEventListener('DOMContentLoaded', function() {
+    const contactForm = document.getElementById('contactForm');
     const successMessage = document.getElementById('successMessage');
     const errorMessage = document.getElementById('errorMessage');
     const errorText = document.getElementById('errorText');
-    const originalText = submitBtn.textContent;
     
-    // Show loading state
-    submitBtn.textContent = 'Sending...';
-    submitBtn.disabled = true;
-    successMessage.style.display = 'none';
-    errorMessage.style.display = 'none';
-    
-    // Get form data
-    const formData = {
-        name: document.getElementById('name').value.trim(),
-        email: document.getElementById('email').value.trim(),
-        service: document.getElementById('service').value,
-        message: document.getElementById('message').value.trim(),
-        timestamp: new Date().toISOString()
-    };
-    
-    // Validate form
-    if (!formData.name || !formData.email || !formData.service || !formData.message) {
-        showError('Please fill in all fields before sending.');
-        resetButton();
-        return;
-    }
-    
-    try {
-        console.log('Sending form data to Google Apps Script...');
-        
-        const response = await fetch(GOOGLE_SCRIPT_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(formData)
+    if (contactForm) {
+        contactForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const originalText = submitBtn.textContent;
+            
+            // Show loading state
+            submitBtn.textContent = 'Sending...';
+            submitBtn.disabled = true;
+            successMessage.style.display = 'none';
+            errorMessage.style.display = 'none';
+            
+            // Get form data for validation
+            const name = contactForm.querySelector('input[name="name"]').value.trim();
+            const email = contactForm.querySelector('input[name="email"]').value.trim();
+            const service = contactForm.querySelector('select[name="service"]').value;
+            const message = contactForm.querySelector('textarea[name="message"]').value.trim();
+            
+            // Validate form
+            if (!name || !email || !service || !message) {
+                showError('Please fill in all fields before sending.');
+                resetButton();
+                return;
+            }
+            
+            // Create a temporary iframe to handle form submission
+            const tempIframe = document.createElement('iframe');
+            tempIframe.name = 'formsubmit-target';
+            tempIframe.style.display = 'none';
+            document.body.appendChild(tempIframe);
+            
+            // Set form target to iframe
+            contactForm.target = 'formsubmit-target';
+            
+            // Handle iframe load event
+            tempIframe.onload = function() {
+                setTimeout(() => {
+                    // Show success message
+                    showSuccess();
+                    
+                    // Reset form
+                    contactForm.reset();
+                    
+                    // Reset button
+                    resetButton();
+                    
+                    // Remove iframe
+                    document.body.removeChild(tempIframe);
+                    
+                    // Reset form target
+                    contactForm.target = '_self';
+                }, 1000);
+            };
+            
+            // Submit the form
+            contactForm.submit();
+            
+            function resetButton() {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }
+            
+            function showSuccess() {
+                successMessage.style.display = 'block';
+                successMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+            
+            function showError(message) {
+                errorText.textContent = message;
+                errorMessage.style.display = 'block';
+                errorMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
         });
-
-        const result = await response.json();
-
-        if (!response.ok) {
-            throw new Error(result.error || 'Failed to submit form');
+        
+        // Dynamic placeholder for service selection
+        const serviceSelect = contactForm.querySelector('select[name="service"]');
+        const messageField = contactForm.querySelector('textarea[name="message"]');
+        
+        if (serviceSelect && messageField) {
+            serviceSelect.addEventListener('change', function() {
+                const selectedService = this.value;
+                
+                const placeholders = {
+                    'Accounting Services': 'Tell me about your accounting needs: bookkeeping, tax preparation, financial reporting, etc...',
+                    'Notion Systems': 'Describe what you want to build: business dashboard, workflow automation, templates, etc...',
+                    'Both Services': 'Tell me about both your accounting needs and Notion system requirements...',
+                    'Consultation': 'What would you like to discuss in our consultation?'
+                };
+                
+                messageField.placeholder = placeholders[selectedService] || 'Please describe your project or requirements...';
+            });
         }
-        
-        // Success message
-        showSuccess();
-        document.getElementById('googleContactForm').reset();
-        
-    } catch (error) {
-        console.error('Form submission error:', error);
-        showError('Message sent! (Confirmation may take a moment). For urgent matters, email me directly at kbhanabhagwanwalapn@gmail.com');
-    } finally {
-        resetButton();
     }
-    
-    function resetButton() {
-        submitBtn.textContent = originalText;
-        submitBtn.disabled = false;
-    }
-    
-    function showSuccess() {
-        successMessage.style.display = 'block';
-        successMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
-    
-    function showError(message) {
-        errorText.textContent = message;
-        errorMessage.style.display = 'block';
-        errorMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
-});
-
-// Dynamic placeholder for service selection
-document.getElementById('service').addEventListener('change', function() {
-    const messageField = document.getElementById('message');
-    const selectedService = this.value;
-    
-    const placeholders = {
-        'Accounting Services': 'Tell me about your accounting needs: bookkeeping, tax preparation, financial reporting, etc...',
-        'Notion Systems': 'Describe what you want to build: business dashboard, workflow automation, templates, etc...',
-        'Both Services': 'Tell me about both your accounting needs and Notion system requirements...',
-        'Consultation': 'What would you like to discuss in our consultation?'
-    };
-    
-    messageField.placeholder = placeholders[selectedService] || 'Please describe your project or requirements...';
 });
 
 // Smooth scrolling for navigation links
@@ -304,4 +311,4 @@ document.querySelectorAll('nav a').forEach(link => {
     });
 });
 
-console.log("🎯 Portfolio with ALL animations + Google Apps Script integration ready!");
+console.log("🎯 Portfolio with FormSubmit integration ready!");
